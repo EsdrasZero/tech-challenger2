@@ -2,8 +2,7 @@ import { database } from './../../lib/pg/db';
 import { IPostRepository } from "../post.repository.interface";
 import { IPost } from '../../entities/model/post.interface';
 import { ITeacher } from '../../entities/model/teacher.interface';
-
-
+import { IPostUpdate } from '@/entities/model/post.update.interface';
 export class PostRepository implements IPostRepository {
 
   async getAll(
@@ -26,23 +25,23 @@ export class PostRepository implements IPostRepository {
     return result?.rows || [];
   }
 
-async getOne(postId: string): Promise<(IPost & ITeacher) | null> {
-  const result = await database.clientInstance?.query(
-    `
+  async getOne(postId: string): Promise<(IPost & ITeacher) | null> {
+    const result = await database.clientInstance?.query(
+      `
     SELECT post.id, post.title, post.content, post.createdAt, teacher.id as idTeacher, teacher.name, teacher.school_subject
     FROM post
     INNER JOIN teacher
     ON post.teacher_id = teacher.id
     WHERE post.id = $1
     `,
-    [postId]
-  );
+      [postId]
+    );
 
-  return result?.rows[0] || null;
+    return result?.rows[0] || null;
 
-}
+  }
 
-async create({ title, content, teacher_id}: IPost): Promise<IPost> {
+  async create({ title, content, teacher_id }: IPost): Promise<IPost> {
     const now = new Date();
 
     const result = await database.clientInstance?.query(
@@ -54,38 +53,37 @@ async create({ title, content, teacher_id}: IPost): Promise<IPost> {
       [title, content, teacher_id, now]
     );
     return result?.rows[0];
-}
+  }
 
-async updatePost(
-  postId: string,
-  { title, content }: IPost
-): Promise<IPost | null> {
-  const result = await database.clientInstance?.query(
-    `
+  async updatePost(
+    postId: string,
+    { title, content }: IPostUpdate
+  ): Promise<IPost | null> {
+    console.log(title, content);
+    const result = await database.clientInstance?.query(
+      `
     UPDATE post
-    SET title = $1, content = $2
-    WHERE id = $3
+    SET title = COALESCE($1, title), content = COALESCE($2, content)
+    WHERE post.id = $3
     RETURNING *
     `,
-    [title, content, postId]
-  );
+      [title, content, postId]
+    );
+    console.log(result?.rows[0]);
+    return result?.rows[0];
+  }
 
-  return result?.rows[0] || null;
-
-}
-
-async deletePost(postId: string): Promise<IPost | null> {
-  const result = await database.clientInstance?.query(
-    `
+  async deletePost(postId: string): Promise<IPost | null> {
+    const result = await database.clientInstance?.query(
+      `
     DELETE FROM post
     WHERE id = $1
     RETURNING *
     `,
-    [postId]
-  );
+      [postId]
+    );
 
-  return result?.rows[0] || null;
-}
-
+    return result?.rows[0] || null;
+  }
 }
 

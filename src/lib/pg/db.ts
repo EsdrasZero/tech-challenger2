@@ -1,12 +1,13 @@
+import { env } from "@/env";
 import { Pool, PoolClient } from "pg";
-import { env } from "../../env";
 
 const CONFIG = {
-  host:env.POSTGRES_HOST,
-  port:env.POSTGRES_PORT,
-  user:env.POSTGRES_USER,
-  password:env.POSTGRES_PASSWORD,
-  database: env.POSTGRES_DB
+  host: env.POSTGRES_HOST,
+  port: env.POSTGRES_PORT,
+  user: env.POSTGRES_USER,
+  password: env.POSTGRES_PASSWORD,
+  database: env.POSTGRES_DB,
+  ssl: true,
 };
 
 class Database {
@@ -22,8 +23,8 @@ class Database {
     try {
       this.client = await this.pool.connect();
     } catch (error) {
-      console.error(`Error connecting to the database: ${error}`);
-      throw new Error(`Error connecting to the database: ${error}`);
+      console.error(`Error starting connect with database pg`);
+      throw new Error(`Error starting connect with database pg`);
     }
   }
 
