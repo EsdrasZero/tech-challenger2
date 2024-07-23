@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-   "start:dev": "tsx watch src/server.ts",
-   "build" :"tsup src --out-dir build",
+    "start:dev": "tsx watch src/server.ts",
+    "build": "tsup src --out-dir build",
     "start": "node build/server.js"
   },
   "keywords": [],
@@ -12,6 +12,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@fastify/jwt": "8.0.1",
     "dotenv": "16.4.5",
     "fastify": "4.28.1",
     "pg": "8.12.0",
